@@ -1,2 +1,6 @@
-package PACKAGE_NAME;public class inheritanceTest {
+public class inheritanceTest {
+}
+
+class i1 extends inheritanceTest {
+
 }
