@@ -1,0 +1,31 @@
+name: Project guide checks
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check guide links, README navigation and diagrams
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re,urllib.parse
+          p=Path("docs/PROJECT_GUIDE.md");s=p.read_text()
+          assert s.count("~~~")%2==0 and s.count("~~~mermaid")>=3
+          assert "docs/PROJECT_GUIDE.md" in Path("README.md").read_text(encoding="utf-8-sig")
+          for link in re.findall(r"\]\(([^)]+)\)",s):
+           q=link.split("#")[0].split("?")[0]
+           if q and not q.startswith(("https://","http://","#")): assert (p.parent/urllib.parse.unquote(q)).exists(),q
+          print("Guide checks passed")
+          PY
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compile sample Java program
+        run: javac helloWorld.java
+
